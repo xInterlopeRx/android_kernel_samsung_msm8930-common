@@ -4630,6 +4630,30 @@ static int sec_jack_get_adc_value(void)
 	return retVal;
 }
 
+int lcd_id_get_adc_value(void)
+{
+	int rc = 0;
+/*	int retVal = 0;*/
+	int data = 0;
+	struct pm8xxx_adc_chan_result result;
+
+	rc = pm8xxx_adc_mpp_config_read(
+			PM8XXX_AMUX_MPP_2,
+			ADC_MPP_1_AMUX6,
+			&result);
+	if (rc) {
+		pr_err("%s : error reading mpp %d, rc = %d\n",
+			__func__, PM8XXX_AMUX_MPP_2, rc);
+		return rc;
+	}
+/*	retVal = ((int)result.physical)/1000;*/
+	/* use measurement, no need to scale : use measurement */
+	data = (int)result.measurement;
+	pr_err("%s :#reading mpp %d, measurement = %d\n",__func__, PM8XXX_AMUX_MPP_2,data);
+
+	return data;
+}
+
 static struct sec_jack_platform_data sec_jack_data = {
 	.get_det_jack_state	= get_sec_det_jack_state,
 	.get_send_key_state	= get_sec_send_key_state,

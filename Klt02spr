@@ -1,0 +1,29 @@
+#!/bin/bash
+
+DEVICE="lt02spr"
+MKBOOT="/home/john/mkboot/samsung"
+ZIP="/home/john/zip/samsung"
+NEWMODS="$ZIP/lt02spr/lt02spr_boot/system/lib/modules"
+
+make distclean
+export CROSS_COMPILE=/opt/toolchains/arm-eabi-4.6/bin/arm-eabi-
+export ARCH=arm
+export USE_CCACHE=1
+
+make cyanogen_lt02lte_defconfig SELINUX_DEFCONFIG=selinux_defconfig
+make modules
+time make -j8 zImage 2>&1 | tee Kbuild.txt
+
+
+#echo "Copying modules to working dir"
+#find -name '*.ko' -exec cp -av {} $NEWMODS/ \;
+#echo "Copying zImage to working dir"
+#find -name 'zImage' -exec cp -av {} $MKBOOT/$DEVICE/ \;
+#echo "Running mkbootfs and mkbootimg"
+#cd $MKBOOT/$DEVICE
+#. Bootcm
+#echo "Copying boot.img to Edify zip dir"
+#cp $MKBOOT/$DEVICE/boot.img $ZIP/$DEVICE/lt02spr_boot
+
+geany Kbuild.txt
+
