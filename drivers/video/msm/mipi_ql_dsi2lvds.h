@@ -38,12 +38,14 @@
 #define DEFAULT_BRIGHTNESS		MID_BRIGHTNESS_LEVEL
 
 #define V5D3BX_MIN_BRIGHTNESS			0
-#define V5D3BX_MAX_BRIGHTNESS_LEVEL		330
-#define V5D3BX_MID_BRIGHTNESS_LEVEL		185
+#define V5D3BX_MAX_BRIGHTNESS_LEVEL_SDC		330
+#define V5D3BX_MID_BRIGHTNESS_LEVEL_SDC		185
+
+#define V5D3BX_MAX_BRIGHTNESS_LEVEL_BOE		422
+#define V5D3BX_MID_BRIGHTNESS_LEVEL_BOE		233
+
 #define V5D3BX_LOW_BRIGHTNESS_LEVEL		11
 #define V5D3BX_DIM_BRIGHTNESS_LEVEL		5
-#define V5D3BX_DEFAULT_BRIGHTNESS		V5D3BX_MID_BRIGHTNESS_LEVEL
-
 
 struct display_status {
 	unsigned char auto_brightness;
@@ -65,9 +67,6 @@ struct mipi_dsi2lvds_driver_data {
 	struct early_suspend early_suspend;
 #endif
 	struct display_status dstat;
-
-	
-
 };
 
 
@@ -77,11 +76,16 @@ struct mipi_panel_data {
 	struct mipi_dsi2lvds_driver_data *msd;
 };
 
-
 enum {
 	MIPI_RESUME_STATE,
 	MIPI_SUSPEND_STATE,
 };
+
+enum {
+	SDC_PANEL,
+	BOE_PANEL,
+};
+
 int mipi2lvds_vx5b3d_disp_device_register(struct msm_panel_info *pinfo,
 					u32 channel, u32 panel,
 					struct mipi_panel_data *mpd);

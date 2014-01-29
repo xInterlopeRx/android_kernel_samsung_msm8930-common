@@ -80,7 +80,8 @@ extern struct mutex power_state_chagne;
 static struct platform_device *pdev_for_esd;
 extern boolean mdp_shutdown_check;
 #endif
-#if defined(CONFIG_FB_MSM_MIPI_SAMSUNG_OLED_VIDEO_WVGA_PT)
+#if defined(CONFIG_FB_MSM_MIPI_SAMSUNG_OLED_VIDEO_WVGA_PT) \
+|| defined (CONFIG_MACH_LT02_SPR) || defined (CONFIG_MACH_LT02_ATT)
 void pull_reset_low(void){
 if (mipi_dsi_pdata && mipi_dsi_pdata->active_reset)
 	mipi_dsi_pdata->active_reset(0);

@@ -1,0 +1,19 @@
+#!/bin/bash
+
+make distclean
+export CROSS_COMPILE=/opt/toolchains/arm-eabi-4.6/bin/arm-eabi-
+export ARCH=arm
+export USE_CCACHE=1
+
+make cyanogen_serrano_defconfig SELINUX_DEFCONFIG=selinux_defconfig VARIANT_DEFCONFIG=cyanogen_lt02lte_spr_defconfig
+make modules
+time make -j8 zImage 2>&1 | tee Kbuild.log
+
+if [ -f "./arch/arm/boot/zImage" ]; then 
+	`. Kaction_`
+	else
+	echo "Build error!" &&
+	`grep -rns error: Kbuild.log`
+	fi
+
+

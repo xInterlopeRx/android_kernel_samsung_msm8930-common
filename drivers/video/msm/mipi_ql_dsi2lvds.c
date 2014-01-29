@@ -29,6 +29,7 @@
 static struct mipi_dsi2lvds_driver_data msd;
 static unsigned int recovery_boot_mode;
 extern unsigned int system_rev;
+static int lcd_panel; 
 
 struct mutex cabc_lock;
 
@@ -243,6 +244,7 @@ void WriteRegister(u16 addr, u32 w_data)
 	}
 static int first_boot = 1;
 static int bl_reg_old = 0;
+extern int lcd_id_get_adc_value(void);
 
 static void send_i2c_lvds_data(void)
 {
@@ -334,15 +336,33 @@ static void send_i2c_lvds_data(void)
 	WriteRegister(0x158, 0x1);
 
 	mdelay(1); /*For pll locking*/
+}
+
+static void send_i2c_lvds_data2(void)
+{
+	int lcd_id_value = 0;
 
 	WriteRegister(0x160, 0x8f0/*0xff*/);	/*pwm freq.*/
 	WriteRegister(0x604, 0x3FFFFFE0);	/*lvds enable*/
 	msleep(200);
+
 	WriteRegister(0x138, 0x3fff0000);	/*gpio*/
 	WriteRegister(0x15c, 0x5);	/*pwm enable*/
 
 	if((first_boot == 1) || recovery_boot_mode){
 		WriteRegister(0x164, 381);/*75*5078/1000*/
+        	/*
+		sdc
+		 960000~990000
+		 */
+
+		lcd_id_value = lcd_id_get_adc_value();
+		if ((lcd_id_value > 900000) && (lcd_id_value < 1000000) )
+			lcd_panel = SDC_PANEL;
+		else 
+			lcd_panel = BOE_PANEL;
+		pr_info(" - %s:---------------->:lcd_id_value:%d (%d)\n", __func__, lcd_id_value, lcd_panel);
+
 		first_boot = 0;
 	}else {
 		WriteRegister(0x164, bl_reg_old);	/*clock for bl level*/
@@ -378,9 +398,31 @@ static int mipi2lvds_disp_on(struct platform_device *pdev)
 	if (mipi->mode == DSI_VIDEO_MODE)
 			send_i2c_lvds_data();
 
+	pr_info("**-%s:lcd_id\n", __func__);
+
+return 0;
+}
+
+static int mipi2lvds_disp_late_init(struct platform_device *pdev)
+{
+	struct msm_fb_data_type *mfd;
+        struct mipi_panel_info *mipi;
+
+	mfd = platform_get_drvdata(pdev);
+	if (unlikely(!mfd))
+		return -ENODEV;
+	if (unlikely(mfd->key != MFD_KEY))
+		return -EINVAL;
+
+	pr_info("**+ %s **\n", __func__);
+        mipi = &mfd->panel_info.mipi;
+        
+        if (mipi->mode == DSI_VIDEO_MODE)
+	send_i2c_lvds_data2();
+
 	mfd->resume_state = MIPI_RESUME_STATE;
 
-	pr_info("**- %s  **\n", __func__);
+	pr_info("**-%s:lcd_id: (%d)\n", __func__, lcd_panel);
 
 return 0;
 }
@@ -428,12 +470,13 @@ static void mipi2lvds_disp_set_pwm_duty(int level)
 	if (level > MAX_BRIGHTNESS_LEVEL)
 		level = MAX_BRIGHTNESS_LEVEL;
 
+	if (lcd_panel == SDC_PANEL ){
 	if (level >= MID_BRIGHTNESS_LEVEL) {
 		vx5b3d_level  = (level - MID_BRIGHTNESS_LEVEL) *
-		(V5D3BX_MAX_BRIGHTNESS_LEVEL - V5D3BX_MID_BRIGHTNESS_LEVEL) / (MAX_BRIGHTNESS_LEVEL-MID_BRIGHTNESS_LEVEL) + V5D3BX_MID_BRIGHTNESS_LEVEL;
+			(V5D3BX_MAX_BRIGHTNESS_LEVEL_SDC - V5D3BX_MID_BRIGHTNESS_LEVEL_SDC) / (MAX_BRIGHTNESS_LEVEL-MID_BRIGHTNESS_LEVEL) + V5D3BX_MID_BRIGHTNESS_LEVEL_SDC;
 	} else if (level >= LOW_BRIGHTNESS_LEVEL) {
 		vx5b3d_level  = (level - LOW_BRIGHTNESS_LEVEL) *
-		(V5D3BX_MID_BRIGHTNESS_LEVEL - V5D3BX_LOW_BRIGHTNESS_LEVEL) / (MID_BRIGHTNESS_LEVEL-LOW_BRIGHTNESS_LEVEL) + V5D3BX_LOW_BRIGHTNESS_LEVEL;
+			(V5D3BX_MID_BRIGHTNESS_LEVEL_SDC - V5D3BX_LOW_BRIGHTNESS_LEVEL) / (MID_BRIGHTNESS_LEVEL-LOW_BRIGHTNESS_LEVEL) + V5D3BX_LOW_BRIGHTNESS_LEVEL;
 	} else if (level >= DIM_BRIGHTNESS_LEVEL) {
 		vx5b3d_level  = (level - DIM_BRIGHTNESS_LEVEL) *
 		(V5D3BX_LOW_BRIGHTNESS_LEVEL - V5D3BX_DIM_BRIGHTNESS_LEVEL) / (LOW_BRIGHTNESS_LEVEL-DIM_BRIGHTNESS_LEVEL) + V5D3BX_DIM_BRIGHTNESS_LEVEL;
@@ -444,6 +487,26 @@ static void mipi2lvds_disp_set_pwm_duty(int level)
 		pr_info("level = [%d]: vx5b3d_level = [%d]\n",\
 			level,vx5b3d_level);	
 	}
+	}
+	else if (lcd_panel == BOE_PANEL){
+		if (level >= MID_BRIGHTNESS_LEVEL) {
+			vx5b3d_level  = (level - MID_BRIGHTNESS_LEVEL) *
+			(V5D3BX_MAX_BRIGHTNESS_LEVEL_BOE - V5D3BX_MID_BRIGHTNESS_LEVEL_BOE) / (MAX_BRIGHTNESS_LEVEL-MID_BRIGHTNESS_LEVEL) + V5D3BX_MID_BRIGHTNESS_LEVEL_BOE;
+		} else if (level >= LOW_BRIGHTNESS_LEVEL) {
+			vx5b3d_level  = (level - LOW_BRIGHTNESS_LEVEL) *
+			(V5D3BX_MID_BRIGHTNESS_LEVEL_BOE - V5D3BX_LOW_BRIGHTNESS_LEVEL) / (MID_BRIGHTNESS_LEVEL-LOW_BRIGHTNESS_LEVEL) + V5D3BX_LOW_BRIGHTNESS_LEVEL;
+		} else if (level >= DIM_BRIGHTNESS_LEVEL) {
+			vx5b3d_level  = (level - DIM_BRIGHTNESS_LEVEL) *
+			(V5D3BX_LOW_BRIGHTNESS_LEVEL - V5D3BX_DIM_BRIGHTNESS_LEVEL) / (LOW_BRIGHTNESS_LEVEL-DIM_BRIGHTNESS_LEVEL) + V5D3BX_DIM_BRIGHTNESS_LEVEL;
+		} else if (level > 0)
+			vx5b3d_level  = V5D3BX_DIM_BRIGHTNESS_LEVEL;
+		else {
+			vx5b3d_level = 0;
+			pr_info("level = [%d]: vx5b3d_level = [%d]\n",\
+				level,vx5b3d_level);	
+		}
+	}
+	
 	if (msd.dstat.cabc) {
 
 		switch (msd.dstat.auto_brightness) {
@@ -773,6 +836,7 @@ static struct platform_driver this_driver = {
 };
 
 static struct msm_fb_panel_data vx5b3d_panel_data = {
+	.late_init = mipi2lvds_disp_late_init,
 	.on		= mipi2lvds_disp_on,
 	.off		= mipi2lvds_disp_off,
 	.set_backlight	= mipi2lvds_disp_set_backlight,

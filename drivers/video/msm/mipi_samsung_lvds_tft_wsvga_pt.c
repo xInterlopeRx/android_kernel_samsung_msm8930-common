@@ -67,11 +67,11 @@ static int __init mipi2lvds_vx5b3d_wsvga_pt_init(void)
 	/* bitclk */
 	pinfo.clk_rate = 350000000;
 
-	pinfo.lcdc.h_back_porch = 213;/* thfp */
-	pinfo.lcdc.h_front_porch = 213;	/* thb */
+	pinfo.lcdc.h_back_porch = 170;/* thfp */
+	pinfo.lcdc.h_front_porch = 145; /* thb */
 	pinfo.lcdc.h_pulse_width = 7;	/* thpw */
-	pinfo.lcdc.v_back_porch = 16;	/* tvfp */
-	pinfo.lcdc.v_front_porch = 16;	/* tvb */
+	pinfo.lcdc.v_back_porch = 58;	/* tvfp */
+	pinfo.lcdc.v_front_porch = 58;	/* tvb */
 	pinfo.lcdc.v_pulse_width = 2;	/* tvpw */
 
 	pinfo.lcdc.border_clr = 0;		/* black */
