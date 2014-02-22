@@ -46,6 +46,8 @@
 
 #define V5D3BX_LOW_BRIGHTNESS_LEVEL		11
 #define V5D3BX_DIM_BRIGHTNESS_LEVEL		5
+#define V5D3BX_DEFAULT_BRIGHTNESS		V5D3BX_MID_BRIGHTNESS_LEVEL
+
 
 struct display_status {
 	unsigned char auto_brightness;

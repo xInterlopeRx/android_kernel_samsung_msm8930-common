@@ -422,7 +422,7 @@ static int mipi2lvds_disp_late_init(struct platform_device *pdev)
 
 	mfd->resume_state = MIPI_RESUME_STATE;
 
-	pr_info("**-%s:lcd_id: (%d)\n", __func__, lcd_panel);
+	pr_info("**- %s  **\n", __func__);
 
 return 0;
 }
