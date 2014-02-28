@@ -251,6 +251,17 @@ static struct msm_gpiomux_config msm8930_cam_common_configs[] = {
 	{
 		.gpio = GPIO_VT_STBY,
 		.settings = {
+#if defined(CONFIG_MACH_LT02LTE)
+			[GPIOMUX_ACTIVE]    = &cam_settings[2],
+			[GPIOMUX_SUSPENDED] = &cam_settings[0],
+		},
+	},
+	{
+		.gpio = GPIO_MAIN_STBY,
+		.settings = {
+			[GPIOMUX_ACTIVE]    = &cam_settings[2],
+			[GPIOMUX_SUSPENDED] = &cam_settings[0],
+#else
 			[GPIOMUX_ACTIVE]    = &cam_settings[9],
 			[GPIOMUX_SUSPENDED] = &cam_settings[9],
 		},
@@ -259,8 +270,8 @@ static struct msm_gpiomux_config msm8930_cam_common_configs[] = {
 		.gpio = GPIO_MAIN_STBY,
 		.settings = {
 			[GPIOMUX_ACTIVE]    = &cam_settings[9],
-			[GPIOMUX_SUSPENDED] = &cam_settings[9],
-		},
+			[GPIOMUX_SUSPENDED] = &cam_settings[9],		},
+#endif
 	},
 };
 
