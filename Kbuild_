@@ -1,11 +1,11 @@
 #!/bin/bash
 
 make distclean
-export CROSS_COMPILE=/opt/toolchains/arm-eabi-4.6/bin/arm-eabi-
+export CROSS_COMPILE=/opt/toolchains/arm-eabi-4.7/bin/arm-eabi-
 export ARCH=arm
 export USE_CCACHE=1
 
-#make lt02lte_dnm_defconfig SELINUX_DEFCONFIG=selinux_defconfig
+#make lt02lte_extracted_defconfig SELINUX_DEFCONFIG=selinux_defconfig
 make cyanogen_lt02ltexx_defconfig SELINUX_DEFCONFIG=selinux_defconfig
 make modules
 time make -j8 zImage 2>&1 | tee Kbuild.log
