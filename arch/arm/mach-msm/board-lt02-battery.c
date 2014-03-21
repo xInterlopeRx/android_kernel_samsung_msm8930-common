@@ -643,7 +643,7 @@ sec_battery_platform_data_t sec_battery_pdata = {
 #else
 	/* temporarily */
 	.temp_high_threshold_event = 620,
-	.temp_high_recovery_event = 425,
+	.temp_high_recovery_event = 465,
 	.temp_low_threshold_event = -54,
 	.temp_low_recovery_event = 40,
 
