@@ -573,7 +573,8 @@ int mdp4_dsi_video_splash_done(void)
 	return 0;
 }
 
-#if defined(CONFIG_FB_MSM_MIPI_SAMSUNG_OLED_VIDEO_WVGA_PT)
+#if defined(CONFIG_FB_MSM_MIPI_SAMSUNG_OLED_VIDEO_WVGA_PT) \
+|| defined (CONFIG_MACH_LT02_SPR) || defined (CONFIG_MACH_LT02_ATT)
 void pull_reset_low(void);
 #endif
 #if defined(CONFIG_MACH_LT02_CHN_CTC)
@@ -706,7 +707,8 @@ int mdp4_dsi_video_on(struct platform_device *pdev)
 #endif
 /* QC Patch for LCD black out Issue */
 	if (!(mfd->cont_splash_done)) {
-#if defined(CONFIG_FB_MSM_MIPI_SAMSUNG_OLED_VIDEO_WVGA_PT)
+#if defined(CONFIG_FB_MSM_MIPI_SAMSUNG_OLED_VIDEO_WVGA_PT) \
+|| defined (CONFIG_MACH_LT02_SPR) || defined (CONFIG_MACH_LT02_ATT)
 	pull_reset_low();
 #endif
 		mfd->cont_splash_done = 1;
