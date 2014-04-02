@@ -8,11 +8,11 @@ export USE_CCACHE=1
 #make lt02lte_extracted_defconfig SELINUX_DEFCONFIG=selinux_defconfig
 make cyanogen_lt02ltexx_defconfig SELINUX_DEFCONFIG=selinux_defconfig
 make modules
-time make -j8 zImage 2>&1 | tee Kbuild.log
+time make -j16 zImage 2>&1 | tee Kbuild.log
 
 if [ -f "./arch/arm/boot/zImage" ]; then
 	`. Kaction_`
 	else
 	echo "Build error!" &&
-	`grep -rns error: Kbuild.log`
+	`grep -rns error: ./Kbuild.log`
 	fi
