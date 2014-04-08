@@ -6,7 +6,7 @@ export ARCH=arm
 export USE_CCACHE=1
 
 #make lt02lte_extracted_defconfig SELINUX_DEFCONFIG=selinux_defconfig
-make cyanogen_lt02ltexx_defconfig SELINUX_DEFCONFIG=selinux_defconfig
+make cyanogen_lt02lte_defconfig SELINUX_DEFCONFIG=selinux_defconfig
 make modules
 time make -j16 zImage 2>&1 | tee Kbuild.log
 
